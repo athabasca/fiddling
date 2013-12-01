@@ -3,11 +3,26 @@
 
  #include <stdio.h>
 
- int main()
+ int main(int argc, char **argv)
  {
 	int i;
+	FILE *fp;
 
-	while (scanf("%d", &i) == 1)
+	/* Read from file if filename provided, else from stdin. */
+	if (argc > 1)
+	{
+		fp = fopen(argv[1], "r");
+		if (fp == NULL)
+		{
+			printf("Error opening %s.\n", argv[1]);
+			return(1);
+		}
+	} else
+	{
+		fp = stdin;
+	}
+
+	while (fscanf(fp, "%d", &i) == 1)
 	{
 		printf("Read number: %d\n", i);
 	}
