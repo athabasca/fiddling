@@ -10,11 +10,19 @@ LICENSE_VALID = 0
 LICENSE_INVALID = 1
 LICENSE_EXPIRED = 2
 
+def verify_signature(key, message, signature):
+	h = SHA256.new()
+	h.update(message)
+
+	verifier = PKCS1_PSS.new(key)
+	return verifier.verify(h, signature)
+
 def validate_license(key, f):
 	license = f.read()
 
 	delimindex = license.find('=====')
-	return delimindex >= 0
+	if delimindex == -1:
+		return LICENSE_INVALID
 
 	datestring = license[:delimindex]
 	signature = license[delimindex + 5:]
@@ -64,3 +72,5 @@ def main():
 		print('Mysterious error: with useless message')
 		exit(1)
 
+if __name__ == '__main__':
+	main()
