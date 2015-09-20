@@ -1,3 +1,4 @@
+from sys import argv
 from datetime import date
 from Crypto.Signature import PKCS1_PSS
 from Crypto.Hash import SHA256
@@ -11,9 +12,12 @@ def get_signature(key, message):
 	signer = PKCS1_PSS.new(key)
 	return signer.sign(h)
 
-def create_license(key, ldate):
+def create_license(key, ldate, valid=True):
 	datestring = str(ldate.toordinal())
 	signature = get_signature(key, datestring)
+
+	if not valid:
+		datestring = str(ldate.replace(year=(ldate.year + 1)).toordinal())
 
 	with open('license', 'w') as f:
 		f.write(datestring)
@@ -30,9 +34,10 @@ def main():
 		f.write(key.publickey().exportKey())
 
 	# create license file
+	valid = '--invalid' not in argv
 	expiration = date.today()
 	expiration = expiration.replace(year=expiration.year + 2)
-	create_license(key, expiration)
+	create_license(key, expiration, valid)
 
 if __name__ == '__main__':
 	main()
